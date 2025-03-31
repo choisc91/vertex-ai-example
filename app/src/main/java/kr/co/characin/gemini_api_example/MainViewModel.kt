@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
-import com.google.firebase.vertexai.type.Content
 import com.google.firebase.vertexai.type.PublicPreviewAPI
 import com.google.firebase.vertexai.type.content
 import com.google.firebase.vertexai.vertexAI
@@ -31,10 +30,12 @@ class MainViewModel : ViewModel() {
     private val _message = mutableStateListOf<Message>()
     val message: List<Message> get() = _message
 
+    // 지금까지의 Prompt 및 reponse를 제거합니다.
     fun clearData() {
         _message.clear()
     }
 
+    // Multi modal & text prompt에 대한 response를 요청합니다.
     fun sendPrompt(prompt: String, bitmap: Bitmap? = null) {
         if (prompt.isEmpty())
             return
@@ -42,21 +43,14 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             setInProgress(inProgress = true)
             addPrompt(prompt, bitmap)
-            try {
-                if (bitmap != null) {
-                    // MultiModal.
-                    val multiModalPrompt = content {
-                        image(bitmap)
-                        text(prompt)
-                    }
-                    val response = _generativeModel.generateContent(multiModalPrompt)
-                    addTextResponse(response = response.text ?: MESSAGE_FAILED)
 
-                } else {
-                    // Text.
-                    val response = _generativeModel.generateContent(prompt)
-                    addTextResponse(response = response.text ?: MESSAGE_FAILED)
-                }
+            try {
+                val response = if (bitmap != null)
+                    _generativeModel.generateContent(buildMultiModealContent(bitmap, prompt))
+                else
+                    _generativeModel.generateContent(prompt)
+
+                addTextResponse(response = response.text ?: MESSAGE_FAILED)
 
             } catch (e: Exception) {
                 addTextResponse(response = "$MESSAGE_EXCEPTION, ${e.message}")
@@ -66,6 +60,8 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    // 이미지 생성에 대한 response를 요청합니다.
+    // 현재 prompt는 English only 입니다.
     fun sendRequestImagePrompt(prompt: String) {
         if (prompt.isEmpty())
             return
@@ -85,19 +81,29 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    // Progress 상태를 업데이트 합니다.
     private fun setInProgress(inProgress: Boolean) {
         _inProgressFlow.value = inProgress
     }
 
+    // 프롬프트 상태를 업데이트합니다.
     private fun addPrompt(prompt: String, bitmap: Bitmap? = null) {
         _message.add(element = Message.prompt(prompt, bitmap))
     }
 
+    // 리스폰스 상태를 업데이트합니다. text only.
     private fun addTextResponse(response: String) {
         _message.add(element = Message.response(response))
     }
 
+    // 리스폰스 상태를 업데이트 합니다. multi modal.
     private fun addImageResponse(bitmap: Bitmap) {
         _message.add(element = Message.response(response = "", bitmap = bitmap))
+    }
+
+    // Multi modal request content를 반환합니다.
+    private fun buildMultiModealContent(bitmap: Bitmap, prompt: String) = content {
+        image(bitmap)
+        text(prompt)
     }
 }

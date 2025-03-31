@@ -7,9 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -68,21 +71,35 @@ class MainActivity : ComponentActivity() {
                             onBitmapChange = { imageBitmap = it },
                         )
 
-                        // 입력된 프롬프트를 실행하는 버튼.
-                        Button(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(size = 8.dp),
-                            onClick = {
-                                if (selectedOption == "imagen3")
-                                    _viewModel.sendRequestImagePrompt(prompt)
-                                else
-                                    _viewModel.sendPrompt(prompt, imageBitmap)
+                        ) {
+                            // 입력된 프롬프트를 실행하는 버튼.
+                            Button(
+                                modifier = Modifier.weight(.5f),
+                                shape = RoundedCornerShape(size = 8.dp),
+                                onClick = { _viewModel.clearData() },
+                                content = { Text("CLEAR") }
+                            )
 
-                                prompt = ""
-                                imageBitmap = null
-                            },
-                            content = { Text("SEND") }
-                        )
+                            Spacer(modifier = Modifier.width(6.dp))
+
+                            // Clear 버튼.
+                            Button(
+                                modifier = Modifier.weight(.5f),
+                                shape = RoundedCornerShape(size = 8.dp),
+                                onClick = {
+                                    if (selectedOption == "imagen3")
+                                        _viewModel.sendRequestImagePrompt(prompt)
+                                    else
+                                        _viewModel.sendPrompt(prompt, imageBitmap)
+
+                                    prompt = ""
+                                    imageBitmap = null
+                                },
+                                content = { Text("SEND") }
+                            )
+                        }
                     }
 
                     // 프롬프트 실행 후 비동기 처리를 보여주기 위한 프로그레스 바.
