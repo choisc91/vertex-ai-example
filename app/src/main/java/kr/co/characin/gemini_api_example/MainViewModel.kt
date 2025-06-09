@@ -46,7 +46,7 @@ class MainViewModel : ViewModel() {
 
             try {
                 val response = if (bitmap != null)
-                    _generativeModel.generateContent(buildMultiModealContent(bitmap, prompt))
+                    _generativeModel.generateContent(buildMultiModalContent(bitmap, prompt))
                 else
                     _generativeModel.generateContent(prompt)
 
@@ -102,7 +102,7 @@ class MainViewModel : ViewModel() {
     }
 
     // Multi modal request content를 반환합니다.
-    private fun buildMultiModealContent(bitmap: Bitmap, prompt: String) = content {
+    private fun buildMultiModalContent(bitmap: Bitmap, prompt: String) = content {
         image(bitmap)
         text(prompt)
     }
