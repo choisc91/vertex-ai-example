@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            // 입력된 프롬프트를 실행하는 버튼.
+                            // Clear 버튼.
                             Button(
                                 modifier = Modifier.weight(.5f),
                                 shape = RoundedCornerShape(size = 8.dp),
@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
 
                             Spacer(modifier = Modifier.width(6.dp))
 
-                            // Clear 버튼.
+                            // 입력된 프롬프트를 실행하는 버튼.
                             Button(
                                 modifier = Modifier.weight(.5f),
                                 shape = RoundedCornerShape(size = 8.dp),
